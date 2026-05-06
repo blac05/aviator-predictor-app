@@ -1,52 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 
-function Dashboard({ user }) {
-  const [stats, setStats] = useState(null);
+function Dashboard({ company }) {
+  const [prediction, setPrediction] = useState(null);
 
   useEffect(() => {
-    if (user) fetchStats();
-  }, [user]);
+    fetchPrediction();
+  }, [company]);
 
-  const fetchStats = async () => {
+  const fetchPrediction = async () => {
     try {
-      const response = await fetch(`/api/users/${user._id}/stats`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/predictions/next?company=${company}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const data = await response.json();
-      setStats(data);
+      setPrediction(data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching prediction:', error);
     }
   };
 
-  if (!stats) return <div className="dashboard">Loading...</div>;
+  if (!prediction) return <div className="dashboard">Loading prediction...</div>;
 
   return (
     <div className="dashboard">
-      <h2>📊 Statistics</h2>
+      <h2>🔮 Prediction for {company}</h2>
       
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Total Balance</h3>
-          <p className="stat-value">${stats.balance?.toFixed(2) || 0}</p>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Total Bets</h3>
-          <p className="stat-value">{stats.totalBets || 0}</p>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Total Winnings</h3>
-          <p className="stat-value" style={{ color: stats.totalWinnings > 0 ? 'green' : 'red' }}>
-            ${stats.totalWinnings?.toFixed(2) || 0}
-          </p>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Win Rate</h3>
-          <p className="stat-value">{(stats.winRate || 0).toFixed(1)}%</p>
-        </div>
+      <div className="prediction-card">
+        <h3>Next Crash Prediction</h3>
+        <p className="prediction-value">{prediction.prediction?.toFixed(2)}x</p>
+        <p className="confidence">Confidence: {prediction.confidence?.toFixed(1)}%</p>
       </div>
+    </div>
+  );
+}
+
+export default Dashboard;
 
       <div className="performance-chart">
         <h3>Recent Performance</h3>

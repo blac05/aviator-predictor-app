@@ -1,53 +1,28 @@
 const express = require('express');
-const User = require('../models/User');
 const jwt = require('jwt-simple');
 const router = express.Router();
 
-// Register
-router.post('/register', async (req, res) => {
+// Access with passkey
+router.post('/access', (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { passkey } = req.body;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!passkey) {
+      return res.status(400).json({ error: 'Passkey required' });
     }
 
-    const userExists = await User.findOne({ $or: [{ email }, { username }] });
-    if (userExists) {
-      return res.status(400).json({ error: 'User already exists' });
+    if (passkey !== process.env.PASSKEY) {
+      return res.status(401).json({ error: 'Invalid passkey' });
     }
 
-    const user = new User({ username, email, password });
-    await user.save();
-
-    const token = jwt.encode({ id: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ message: 'User registered', token, userId: user._id });
+    const token = jwt.encode({ access: true }, process.env.JWT_SECRET);
+    res.json({ message: 'Access granted', token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Login
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Missing credentials' });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const passwordMatch = await user.comparePassword(password);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const token = jwt.encode({ id: user._id }, process.env.JWT_SECRET);
-    res.json({ message: 'Login successful', token, userId: user._id, balance: user.balance });
+module.exports = router;
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

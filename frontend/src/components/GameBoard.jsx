@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './GameBoard.css';
 
-function GameBoard({ currentGame, gameStatus }) {
+function GameBoard({ currentGame, gameStatus, company }) {
   const [multiplier, setMultiplier] = useState(1.0);
+  const [games, setGames] = useState([]);
+
+  useEffect(() => {
+    fetchGames();
+  }, [company]);
 
   useEffect(() => {
     if (gameStatus === 'running') {
@@ -13,22 +18,39 @@ function GameBoard({ currentGame, gameStatus }) {
     }
   }, [gameStatus]);
 
+  const fetchGames = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/games?company=${company}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setGames(data);
+    } catch (error) {
+      console.error('Error fetching games:', error);
+    }
+  };
+
+  const activeGame = games[0] || currentGame;
+
   return (
     <div className="game-board">
       <div className="game-header">
-        <h2>Active Game</h2>
+        <h2>Active Games for {company}</h2>
         <span className={`status ${gameStatus}`}>{gameStatus.toUpperCase()}</span>
       </div>
       
-      <div className="crash-display">
-        <div className="multiplier-big">{multiplier}x</div>
-        {currentGame?.predictedCrash && (
-          <div className="prediction-info">
-            <p>📊 Predicted: {currentGame.predictedCrash}x</p>
-            <p>🎯 Confidence: {(currentGame.confidence * 100).toFixed(0)}%</p>
-          </div>
-        )}
-      </div>
+      {activeGame && (
+        <div className="crash-display">
+          <div className="multiplier-big">{multiplier}x</div>
+          {activeGame.predictedCrash && (
+            <div className="prediction-info">
+              <p>📊 Predicted: {activeGame.predictedCrash}x</p>
+              <p>🎯 Confidence: {(activeGame.confidence * 100).toFixed(0)}%</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="game-chart">
         <svg width="100%" height="300">
@@ -40,14 +62,18 @@ function GameBoard({ currentGame, gameStatus }) {
       <div className="game-stats">
         <div className="stat">
           <span>💰 Total Bets:</span>
-          <strong>${currentGame?.totalBets || 0}</strong>
+          <strong>${activeGame?.totalBets || 0}</strong>
         </div>
         <div className="stat">
-          <span>🎰 Players:</span>
-          <strong>Loading...</strong>
+          <span>🎰 Games:</span>
+          <strong>{games.length}</strong>
         </div>
       </div>
     </div>
+  );
+}
+
+export default GameBoard;
   );
 }
 

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema({
   gameId: { type: String, unique: true, required: true },
+  company: { type: String, required: true },
   crashPoint: { type: Number, required: true },
   predictedCrash: { type: Number, default: null },
   confidence: { type: Number, default: 0 },
