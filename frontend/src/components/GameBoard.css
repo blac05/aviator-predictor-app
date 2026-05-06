@@ -1,0 +1,98 @@
+.game-board {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.game-header h2 {
+  font-size: 1.5em;
+  color: #333;
+}
+
+.status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.status.idle {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.status.running {
+  background: #4caf50;
+  color: white;
+}
+
+.status.crashed {
+  background: #f44336;
+  color: white;
+}
+
+.crash-display {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+}
+
+.multiplier-big {
+  font-size: 3em;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 10px;
+}
+
+.prediction-info {
+  margin-top: 15px;
+  font-size: 0.95em;
+  color: #666;
+}
+
+.prediction-info p {
+  margin: 5px 0;
+}
+
+.game-chart {
+  margin: 20px 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stat {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat span {
+  color: #666;
+  font-weight: 500;
+}
+
+.stat strong {
+  font-size: 1.3em;
+  color: #667eea;
+}
